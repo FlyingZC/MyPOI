@@ -1,0 +1,7 @@
+一.POI操作的excel对象
+HSSF:操作excel97(.xls)格式
+XSSF:操作excel2007 OOXML(.xlsx)格式,操作excel时内存占用高于HSSF
+SXSSF:从POI3.8开始支持,基于XSSF,低内存占用
+
+二.
+HSSF生成的Excel 97(.xls)格式本身就有每个sheet页不能超过65536条的限制。
