@@ -29,6 +29,7 @@ import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
@@ -40,26 +41,25 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-public class ExcelUtil
-{
-    public static String NO_DEFINE = "no_define";//未定义的字段
+public class ExcelUtil {
+    public static String NO_DEFINE = "no_define";// 未定义的字段
 
-    public static String DEFAULT_DATE_PATTERN = "yyyy年MM月dd日";//默认日期格式
+    public static String DEFAULT_DATE_PATTERN = "yyyy年MM月dd日";// 默认日期格式
 
     public static int DEFAULT_COLOUMN_WIDTH = 17;
 
     /**
-     * 导出Excel 97(.xls)格式 ，少量数据
-     * @param title 标题行 
-     * @param headMap 属性名-列名 的映射
-     * @param jsonArray 数据集
-     * @param datePattern 日期格式，null则用默认日期格式
-     * @param colWidth 列宽 默认 至少17个字节
-     * @param out 输出流
+     * 导出Excel 97(.xls)格式, 少量数据
+     *
+     * @param title       标题行
+     * @param headMap     属性名-列名 的映射
+     * @param jsonArray   数据集
+     * @param datePattern 日期格式,null则用默认日期格式
+     * @param colWidth    列宽 默认 至少17个字节
+     * @param out         输出流
      */
     public static void exportExcel(String title, Map<String, String> headMap, JSONArray jsonArray, String datePattern,
-            int colWidth, OutputStream out)
-    {
+                                   int colWidth, OutputStream out) {
         System.out.println("开始导出excel.");
         if (datePattern == null)
             datePattern = DEFAULT_DATE_PATTERN;
@@ -67,22 +67,23 @@ public class ExcelUtil
         HSSFWorkbook workbook = new HSSFWorkbook();
         workbook.createInformationProperties();
         workbook.getDocumentSummaryInformation().setCompany("*****公司");
-        //设置excel的相关信息
+
+        // 设置excel的相关信息
         SummaryInformation si = workbook.getSummaryInformation();
-        si.setAuthor("zc"); //填加xls文件作者信息
-        si.setApplicationName("导出程序"); //填加xls文件创建程序信息
-        si.setLastAuthor("最后保存者信息"); //填加xls文件最后保存者信息
-        si.setComments("zc is a programmer"); //填加xls文件作者信息
-        si.setTitle("POI导出Excel"); //填加xls文件标题信息
-        si.setSubject("POI导出Excel");//填加文件主题信息
+        si.setAuthor("zc"); // 填加xls文件作者信息
+        si.setApplicationName("导出程序"); // 填加xls文件创建程序信息
+        si.setLastAuthor("最后保存者信息"); // 填加xls文件最后保存者信息
+        si.setComments("zc is a programmer"); // 填加xls文件作者信息
+        si.setTitle("POI导出Excel"); // 填加xls文件标题信息
+        si.setSubject("POI导出Excel");// 填加文件主题信息
         si.setCreateDateTime(new Date());
-        
-        //表头样式 创建单元格样式
+
+        // 表头样式 创建单元格样式
         HSSFCellStyle titleStyle = workbook.createCellStyle();
-        //设置居中对齐
+        // 设置居中对齐
         titleStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
 
-        //设置 字体
+        // 设置 字体
         HSSFFont titleFont = workbook.createFont();
         titleFont.setFontHeightInPoints((short) 20);
         titleFont.setBoldweight((short) 700);
@@ -90,8 +91,10 @@ public class ExcelUtil
 
         // 列头样式 创建单元格样式
         HSSFCellStyle headerStyle = workbook.createCellStyle();
+        // 默认背景颜色 白色
+        headerStyle.setFillForegroundColor(HSSFColor.WHITE.index);
         headerStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-        //设置边框
+        // 设置边框
         headerStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
         headerStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);
         headerStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);
@@ -105,6 +108,8 @@ public class ExcelUtil
 
         // 单元格样式
         HSSFCellStyle cellStyle = workbook.createCellStyle();
+        // 默认背景颜色 白色
+        cellStyle.setFillForegroundColor(HSSFColor.WHITE.index);
         cellStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
         cellStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
         cellStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);
@@ -127,69 +132,64 @@ public class ExcelUtil
 
         // 设置注释内容
         comment.setString(new HSSFRichTextString("可以在POI中添加注释！"));
-        // 设置注释作者，当鼠标移动到单元格上是可以在状态栏中看到该内容.
-        comment.setAuthor("JACK");
-        
-        //设置列宽 至少字节数
+        // 设置注释作者,当鼠标移动到单元格上是可以在状态栏中看到该内容.
+        comment.setAuthor("flyingzc");
+
+        // 设置列宽 至少字节数
         int minColumnWidthByte = colWidth < DEFAULT_COLOUMN_WIDTH ? DEFAULT_COLOUMN_WIDTH : colWidth;
-        //每一列的宽度 数组
+        // 每一列的宽度 数组
         int[] columnWidthArray = new int[headMap.size()];
-        
-        //属性名 数组
+
+        // 属性名 数组
         String[] properties = new String[headMap.size()];
-        //属性名 对应的 列名 数组
+        // 属性名 对应的 列名 数组
         String[] headers = new String[headMap.size()];
-        
+
         // 产生表格标题行,以及设置列宽
         int index = 0;
-        for(String fieldName : headMap.keySet())
-        {
+        for (String fieldName : headMap.keySet()) {
             properties[index] = fieldName;
             headers[index] = fieldName;
-            
+
             int fieldBytes = fieldName.getBytes().length;
-            //设置 每一列的列宽,根据 当前列名 宽度 和 最小列宽 比较
+            // 设置 每一列的列宽,根据 当前列名 宽度 和 最小列宽 比较
             columnWidthArray[index] = fieldBytes < minColumnWidthByte ? minColumnWidthByte : fieldBytes;
             sheet.setColumnWidth(index, columnWidthArray[index] * 256);
             index++;
         }
-        
-        // 遍历集合数据，产生数据行
+
+        // 遍历集合数据,产生数据行
         int rowIndex = 0;
-        for (Object obj : jsonArray)
-        {
-            System.out.println("开始导出"+rowIndex+"行");
-            if (rowIndex == 65535 || rowIndex == 0)
-            {
+        for (Object obj : jsonArray) {
+            System.out.println("开始导出" + rowIndex + "行");
+            if (rowIndex == 65535 || rowIndex == 0) {
                 if (rowIndex != 0)
-                    sheet = workbook.createSheet();//如果数据超过了，则在第二页显示
-                
-                //表头 rowIndex=0
+                    sheet = workbook.createSheet();// 如果数据超过了,则在第二页显示
+
+                // 表头 rowIndex = 0
                 HSSFRow titleRow = sheet.createRow(0);
                 titleRow.createCell(0).setCellValue(title);
                 titleRow.getCell(0).setCellStyle(titleStyle);
                 sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, headMap.size() - 1));
-                
-                //列头 rowIndex =1
-                HSSFRow headerRow = sheet.createRow(1); 
-                for (int i = 0; i < headers.length; i++)
-                {
+
+                // 列头 rowIndex = 1
+                HSSFRow headerRow = sheet.createRow(1);
+                for (int i = 0; i < headers.length; i++) {
                     headerRow.createCell(i).setCellValue(headers[i]);
                     headerRow.getCell(i).setCellStyle(headerStyle);
                 }
-                //数据内容从 rowIndex=2开始
+                // 数据内容从 rowIndex = 2 开始
                 rowIndex = 2;
             }
-            
+
             JSONObject jsonObject = (JSONObject) JSONObject.toJSON(obj);
-            //创建一行
+            // 创建一行
             HSSFRow dataRow = sheet.createRow(rowIndex);
-            for (int i = 0; i < properties.length; i++)
-            {
+            for (int i = 0; i < properties.length; i++) {
                 HSSFCell newCell = dataRow.createCell(i);
 
                 Object currObj = jsonObject.get(properties[i]);
-                
+
                 String cellValue = "";
                 if (currObj == null)
                     cellValue = "";
@@ -203,47 +203,47 @@ public class ExcelUtil
             }
             rowIndex++;
         }
-        
+
         // 自动调整宽度
-        for (int i = 0; i < headers.length; i++)
-        {
+        for (int i = 0; i < headers.length; i++) {
             sheet.autoSizeColumn(i);
         }
-        try
-        {
+        try {
             workbook.write(out);
             out.close();
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     /**
      * 导出Excel 2007 OOXML (.xlsx)格式
-     * @param title 标题行
-     * @param headMap 属性-列头
-     * @param jsonArray 数据集
-     * @param datePattern 日期格式，传null值则默认 年月日
-     * @param colWidth 列宽 默认 至少17个字节
-     * @param out 输出流
+     *
+     * @param title       标题行
+     * @param headMap     属性-列头
+     * @param jsonArray   数据集
+     * @param datePattern 日期格式,传null值则默认 年月日
+     * @param colWidth    列宽 默认 至少17个字节
+     * @param out         输出流
      */
     public static void exportExcelX(String title, Map<String, String> headMap, JSONArray jsonArray, String datePattern,
-            int colWidth, OutputStream out)
-    {
+                                    int colWidth, OutputStream out) {
         if (datePattern == null)
             datePattern = DEFAULT_DATE_PATTERN;
         // 声明一个工作薄
-        SXSSFWorkbook workbook = new SXSSFWorkbook(1000);//缓存
+        SXSSFWorkbook workbook = new SXSSFWorkbook(1000);// 缓存
         workbook.setCompressTempFiles(true);
-        //表头样式
+
+        // 表头样式
         CellStyle titleStyle = workbook.createCellStyle();
         titleStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
         Font titleFont = workbook.createFont();
         titleFont.setFontHeightInPoints((short) 20);
         titleFont.setBoldweight((short) 700);
         titleStyle.setFont(titleFont);
+        // 默认背景颜色 白色
+        titleStyle.setFillForegroundColor(HSSFColor.WHITE.index);
+
         // 列头样式
         CellStyle headerStyle = workbook.createCellStyle();
         headerStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
@@ -256,6 +256,9 @@ public class ExcelUtil
         headerFont.setFontHeightInPoints((short) 12);
         headerFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
         headerStyle.setFont(headerFont);
+        // 默认背景颜色 白色
+        headerStyle.setFillForegroundColor(HSSFColor.WHITE.index);
+
         // 单元格样式
         CellStyle cellStyle = workbook.createCellStyle();
         cellStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
@@ -268,17 +271,19 @@ public class ExcelUtil
         Font cellFont = workbook.createFont();
         cellFont.setBoldweight(HSSFFont.BOLDWEIGHT_NORMAL);
         cellStyle.setFont(cellFont);
+        // 默认背景颜色 白色
+        cellStyle.setFillForegroundColor(HSSFColor.WHITE.index);
+
         // 生成一个(带标题)表格
         Sheet sheet = workbook.createSheet();
-        //设置列宽
-        int minBytes = colWidth < DEFAULT_COLOUMN_WIDTH ? DEFAULT_COLOUMN_WIDTH : colWidth;//至少字节数
+        // 设置列宽
+        int minBytes = colWidth < DEFAULT_COLOUMN_WIDTH ? DEFAULT_COLOUMN_WIDTH : colWidth;// 至少字节数
         int[] arrColWidth = new int[headMap.size()];
         // 产生表格标题行,以及设置列宽
         String[] properties = new String[headMap.size()];
         String[] headers = new String[headMap.size()];
         int ii = 0;
-        for (Iterator<String> iter = headMap.keySet().iterator(); iter.hasNext();)
-        {
+        for (Iterator<String> iter = headMap.keySet().iterator(); iter.hasNext(); ) {
             String fieldName = iter.next();
 
             properties[ii] = fieldName;
@@ -289,33 +294,29 @@ public class ExcelUtil
             sheet.setColumnWidth(ii, arrColWidth[ii] * 256);
             ii++;
         }
-        // 遍历集合数据，产生数据行
+        // 遍历集合数据,产生数据行
         int rowIndex = 0;
-        for (Object obj : jsonArray)
-        {
-            if (rowIndex == 65535 || rowIndex == 0)
-            {
+        for (Object obj : jsonArray) {
+            if (rowIndex == 65535 || rowIndex == 0) {
                 if (rowIndex != 0)
-                    sheet = workbook.createSheet();//如果数据超过了，则在第二页显示
+                    sheet = workbook.createSheet();// 如果数据超过了,则在第二页显示
 
-                Row titleRow = sheet.createRow(0);//表头 rowIndex=0
+                Row titleRow = sheet.createRow(0);// 表头 rowIndex = 0
                 titleRow.createCell(0).setCellValue(title);
                 titleRow.getCell(0).setCellStyle(titleStyle);
                 sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, headMap.size() - 1));
 
-                Row headerRow = sheet.createRow(1); //列头 rowIndex =1
-                for (int i = 0; i < headers.length; i++)
-                {
+                Row headerRow = sheet.createRow(1); // 列头 rowIndex = 1
+                for (int i = 0; i < headers.length; i++) {
                     headerRow.createCell(i).setCellValue(headers[i]);
                     headerRow.getCell(i).setCellStyle(headerStyle);
 
                 }
-                rowIndex = 2;//数据内容从 rowIndex=2开始
+                rowIndex = 2;// 数据内容从 rowIndex = 2开始
             }
             JSONObject jo = (JSONObject) JSONObject.toJSON(obj);
             Row dataRow = sheet.createRow(rowIndex);
-            for (int i = 0; i < properties.length; i++)
-            {
+            for (int i = 0; i < properties.length; i++) {
                 Cell newCell = dataRow.createCell(i);
 
                 Object o = jo.get(properties[i]);
@@ -335,32 +336,27 @@ public class ExcelUtil
             rowIndex++;
         }
         // 自动调整宽度
-        /*for (int i = 0; i < headers.length; i++) {
+        for (int i = 0; i < headers.length; i++) {
             sheet.autoSizeColumn(i);
-        }*/
-        try
-        {
+        }
+        try {
             workbook.write(out);
             workbook.dispose();
             out.close();
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    //Web 导出excel
+    // Web 导出excel
     public static void downloadExcelFile(String title, Map<String, String> headMap, JSONArray ja,
-            HttpServletResponse response)
-    {
-        try
-        {
+                                         HttpServletResponse response) {
+        try {
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             ExcelUtil.exportExcelX(title, headMap, ja, null, 0, os);
             byte[] content = os.toByteArray();
             InputStream is = new ByteArrayInputStream(content);
-            // 设置response参数，可以打开下载页面
+            // 设置response参数,可以打开下载页面
             response.reset();
 
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8");
@@ -372,25 +368,21 @@ public class ExcelUtil
             BufferedOutputStream bos = new BufferedOutputStream(outputStream);
             byte[] buff = new byte[8192];
             int bytesRead;
-            while (-1 != (bytesRead = bis.read(buff, 0, buff.length)))
-            {
+            while (-1 != (bytesRead = bis.read(buff, 0, buff.length))) {
                 bos.write(buff, 0, bytesRead);
-
             }
             bis.close();
             bos.close();
             outputStream.flush();
             outputStream.close();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public static void main(String[] args) throws IOException
     {
-        int count = 100000;//10万条
+        int count = 100000;// 10万条
         JSONArray jsonArray = new JSONArray();
         for (int i = 0; i < 100000; i++)
         {
@@ -404,7 +396,7 @@ public class ExcelUtil
             jsonArray.add(stu);
         }
         
-        //列名
+        // 列名
         Map<String, String> headMap = new LinkedHashMap<String, String>();
         headMap.put("name", "姓名");
         headMap.put("age", "年龄");
@@ -414,7 +406,7 @@ public class ExcelUtil
         headMap.put("sex", "性别");
 
         String title = "测试";
-        //导出为xls
+        // 导出为xls
         OutputStream outXls = new FileOutputStream("E://a.xls");
         System.out.println("正在导出xls....");
         Date d = new Date();
@@ -423,7 +415,7 @@ public class ExcelUtil
         outXls.close();
         
         
-        //导出为xlsx
+        // 导出为xlsx
         OutputStream outXlsx = new FileOutputStream("E://b.xlsx");
         System.out.println("正在导出xlsx....");
         Date d2 = new Date();
